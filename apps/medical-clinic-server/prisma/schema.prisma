@@ -1,0 +1,105 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Doctor {
+  address        String?
+  contactNumber  String?
+  createdAt      DateTime    @default(now())
+  diagnoses      Diagnosis[]
+  email          String?
+  firstName      String?
+  id             String      @id @default(cuid())
+  lastName       String?
+  specialization String?
+  updatedAt      DateTime    @updatedAt
+}
+
+model Patient {
+  address       String?
+  contactNumber String?
+  createdAt     DateTime    @default(now())
+  dateOfBirth   DateTime?
+  diagnoses     Diagnosis[]
+  email         String?
+  firstName     String?
+  id            String      @id @default(cuid())
+  lastName      String?
+  updatedAt     DateTime    @updatedAt
+}
+
+model Sale {
+  createdAt    DateTime    @default(now())
+  date         DateTime?
+  id           String      @id @default(cuid())
+  medication   Medication? @relation(fields: [medicationId], references: [id])
+  medicationId String?
+  quantity     Int?
+  totalPrice   Float?
+  updatedAt    DateTime    @updatedAt
+}
+
+model Medication {
+  createdAt       DateTime       @default(now())
+  description     String?
+  id              String         @id @default(cuid())
+  inventories     Inventory[]
+  name            String?
+  prescriptions   Prescription[]
+  price           Float?
+  quantityInStock Int?
+  sales           Sale[]
+  updatedAt       DateTime       @updatedAt
+}
+
+model Prescription {
+  createdAt    DateTime    @default(now())
+  diagnosis    Diagnosis?  @relation(fields: [diagnosisId], references: [id])
+  diagnosisId  String?
+  dosage       String?
+  frequency    String?
+  id           String      @id @default(cuid())
+  medication   Medication? @relation(fields: [medicationId], references: [id])
+  medicationId String?
+  updatedAt    DateTime    @updatedAt
+}
+
+model Inventory {
+  createdAt    DateTime    @default(now())
+  id           String      @id @default(cuid())
+  lastUpdated  DateTime?
+  medication   Medication? @relation(fields: [medicationId], references: [id])
+  medicationId String?
+  quantity     Int?
+  updatedAt    DateTime    @updatedAt
+}
+
+model Diagnosis {
+  createdAt     DateTime       @default(now())
+  date          DateTime?
+  description   String?
+  doctor        Doctor?        @relation(fields: [doctorId], references: [id])
+  doctorId      String?
+  id            String         @id @default(cuid())
+  patient       Patient?       @relation(fields: [patientId], references: [id])
+  patientId     String?
+  prescriptions Prescription[]
+  updatedAt     DateTime       @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
